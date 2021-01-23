@@ -1,0 +1,32 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.21'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+    jcenter { url "https://jcenter.bintray.com" }
+    maven { url "https://kotlin.bintray.com/kotlinx" }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+
+    //Sms modem client
+    implementation 'org.buldakov.huawei.modem.client:huawei-api-client:1.0.5'
+
+    //Telegram client
+    implementation 'io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:6.0.1'
+
+    implementation 'org.jetbrains.exposed:exposed-core:0.28.1'
+    implementation 'org.jetbrains.exposed:exposed-jdbc:0.28.1'
+
+    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3")
+
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+    implementation "org.slf4j:slf4j-api:1.6.1"
+}
