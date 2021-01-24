@@ -16,7 +16,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
 
     //Sms modem client
-    implementation 'org.buldakov.huawei.modem.client:huawei-api-client:1.0.5'
+    implementation 'org.buldakov.huawei.modem.client:huawei-api-client:1.0.6'
 
     //Telegram client
     implementation 'io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:6.0.1'

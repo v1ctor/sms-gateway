@@ -19,9 +19,9 @@ class SmsPoller(
     private val stopped = false
     private val smsApi = SmsApi(client)
 
-    private fun startPolling(): Unit {
+    private fun startPolling() {
         while (!stopped) {
-            val sms = smsApi.getSms(1)
+            val sms = smsApi.getSms(amount = 20)
             sms.forEach { messageQueue.offer(it) }
             log.info("$sms")
             Thread.sleep(interval)
