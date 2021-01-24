@@ -13,6 +13,10 @@ import org.buldakov.huawei.modem.model.Message
 import org.buldakov.sms.gateway.core.MessageRouter
 import org.buldakov.sms.gateway.core.SessionManager
 import org.buldakov.sms.gateway.core.SmsPoller
+import org.buldakov.sms.gateway.db.SmsMessage
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -27,12 +31,12 @@ fun main(args: Array<String>) {
         description = "Telegram Bot Token"
     )
         .required()
-//    val dbConnection by parser.option(
-//        ArgType.String,
-//        shortName = "d",
-//        fullName = "db_connection",
-//        description = "DB connection string"
-//    ).required()
+    val dbConnection by parser.option(
+        ArgType.String,
+        shortName = "d",
+        fullName = "db_connection",
+        description = "DB connection string"
+    ).required()
     val modemUrl by parser.option(
         ArgType.String,
         shortName = "m",
@@ -53,6 +57,11 @@ fun main(args: Array<String>) {
     ).required()
     parser.parse(args)
 
+
+    Database.connect(dbConnection, "org.sqlite.JDBC")
+    transaction {
+        SchemaUtils.createMissingTablesAndColumns(SmsMessage)
+    }
 
     val client = ModemClient(modemUrl)
     client.login(username, password)
