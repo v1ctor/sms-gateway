@@ -36,14 +36,15 @@ class SmsPoller(
     }
 
     private fun processMessage(message: Message) {
+        val now = DateTime.now()
         transaction {
             SmsMessage.insert {
                 it[content] = message.content
                 it[from] = message.phone
                 it[date] = message.date.toDateTime().millis
-                it[created] = DateTime.now().millis
+                it[created] = now.millis
             }
-            messageQueue.offer(MessagePayload(message.phone, message.content))
+            messageQueue.offer(MessagePayload(message.phone, message.content, now))
         }
     }
 

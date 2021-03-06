@@ -1,26 +1,9 @@
 package org.buldakov.sms.gateway
 
-import com.github.kotlintelegrambot.bot
-import com.github.kotlintelegrambot.dispatch
-import com.github.kotlintelegrambot.dispatcher.command
-import com.github.kotlintelegrambot.dispatcher.text
-import com.github.kotlintelegrambot.entities.ChatId
-import com.github.kotlintelegrambot.logging.LogLevel
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
 import kotlinx.cli.required
-import org.buldakov.huawei.modem.client.ModemClient
-import org.buldakov.sms.gateway.core.*
-import org.buldakov.sms.gateway.db.SmsMessage
-import org.buldakov.sms.gateway.db.Subscription
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.slf4j.LoggerFactory
-import java.util.concurrent.LinkedBlockingQueue
-
-private val log = LoggerFactory.getLogger("main")
 
 fun main(args: Array<String>) {
     val parser = ArgParser("nfng-bot")
@@ -55,51 +38,19 @@ fun main(args: Array<String>) {
         fullName = "password",
         description = "Huawei Modem HTTP API password."
     ).required()
+    val users by parser.option(
+        ArgType.String,
+        shortName = "a",
+        fullName = "allowed_users",
+        description = "List of allowed users to receive updates"
+    )
     parser.parse(args)
 
+    val allowedUsers = users
+        ?.split(",")
+        ?.map { it.trim().toLowerCase() }
+        ?.toHashSet() ?: hashSetOf()
 
-    Database.connect(dbConnection, "org.sqlite.JDBC")
-    transaction {
-        SchemaUtils.createMissingTablesAndColumns(SmsMessage, Subscription)
-    }
-
-    val client = ModemClient(modemUrl)
-    client.login(username, password)
-
-    val messageQueue = LinkedBlockingQueue<MessagePayload>()
-    val smsPoller = SmsPoller(client, messageQueue)
-    val fakeSmsSender = FakeSmsSender(messageQueue)
-
-
-    val subscriptionManager = SubscriptionManager(setOf("handspringer"))
-    val bot = bot {
-        token = authToken
-        logLevel = LogLevel.All()
-        dispatch {
-            command("join") {
-                val telegramUsername = message.chat.username ?: return@command
-                subscriptionManager.join(telegramUsername, message.chat.id)
-                bot.sendMessage(ChatId.fromId(message.chat.id), text = "You've been added to the sms subscription.")
-                update.consume()
-            }
-            command("leave") {
-                val telegramUsername = message.chat.username ?: return@command
-                subscriptionManager.leave(telegramUsername, message.chat.id)
-                bot.sendMessage(ChatId.fromId(message.chat.id), text = "You've been removed from the sms subscription.")
-                update.consume()
-            }
-            command("status") {
-                update.consume()
-            }
-            text {
-                fakeSmsSender.sendSms("Fake", text)
-                update.consume()
-            }
-        }
-    }
-    val messageRouter = MessageRouter(subscriptionManager, bot, messageQueue)
-    messageRouter.start()
-    smsPoller.start()
-    bot.startPolling()
-
+    val service = SmsGatewayService(dbConnection, modemUrl, username, password, allowedUsers, authToken)
+    service.start()
 }
