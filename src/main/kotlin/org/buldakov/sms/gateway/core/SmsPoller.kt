@@ -12,7 +12,7 @@ import java.util.concurrent.Executors
 
 class SmsPoller(
     client: ModemClient,
-    private val messageQueue: BlockingQueue<Message>,
+    private val messageQueue: BlockingQueue<MessagePayload>,
     private val interval: Long = 1000
 ) {
 
@@ -41,7 +41,7 @@ class SmsPoller(
                 it[from] = message.phone
                 it[date] = message.date.toDateTime().millis
             }
-            messageQueue.offer(message)
+            messageQueue.offer(MessagePayload(message.phone, message.content))
         }
     }
 

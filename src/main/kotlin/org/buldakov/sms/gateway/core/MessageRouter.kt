@@ -1,15 +1,14 @@
 package org.buldakov.sms.gateway.core
 
 import com.github.kotlintelegrambot.Bot
-import org.buldakov.huawei.modem.model.Message
+import com.github.kotlintelegrambot.entities.ChatId
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.Executors
-import java.util.concurrent.ThreadFactory
 
 class MessageRouter(
-    private val sessionManager: SessionManager,
+    private val subscriptionManager: SubscriptionManager,
     private val bot: Bot,
-    private val messageQueue: BlockingQueue<Message>
+    private val messageQueue: BlockingQueue<MessagePayload>
 ) {
     private val executor = Executors.newSingleThreadExecutor()
 
@@ -20,9 +19,9 @@ class MessageRouter(
         }
     }
 
-    private fun sendMessage(message: Message) {
-        sessionManager.sessions.forEach { (_, chatId) ->
-            bot.sendMessage(chatId, text = message.content)
+    private fun sendMessage(message: MessagePayload) {
+        subscriptionManager.subscriptions().forEach { chatId ->
+            bot.sendMessage(ChatId.fromId(chatId), text = message.text)
         }
     }
 

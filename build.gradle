@@ -12,14 +12,19 @@ repositories {
     maven { url "https://kotlin.bintray.com/kotlinx" }
 }
 
+ext {
+    retrofit_version = '2.3.0'
+    okhttp_version = '4.9.0'
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
 
     //Sms modem client
-    implementation "org.buldakov.huawei.modem.client:huawei-api-client:1.0.6"
+    implementation("org.buldakov.huawei.modem.client:huawei-api-client:1.0.6")
 
     //Telegram client
-    implementation "io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:6.0.1"
+    implementation "io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:6.0.4"
 
     implementation "org.jetbrains.exposed:exposed-core:0.28.1"
     implementation "org.jetbrains.exposed:exposed-jdbc:0.28.1"
@@ -31,4 +36,16 @@ dependencies {
 
     implementation "ch.qos.logback:logback-classic:1.2.3"
     implementation "org.slf4j:slf4j-api:1.6.1"
+}
+
+
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'com.squareup.okhttp3') {
+            details.useVersion rootProject.ext.okhttp_version
+        }
+        if (details.requested.group == 'com.squareup.retrofit2') {
+            details.useVersion rootProject.ext.retrofit_version
+        }
+    }
 }
