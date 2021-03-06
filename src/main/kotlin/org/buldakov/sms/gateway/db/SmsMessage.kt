@@ -6,4 +6,5 @@ object SmsMessage : IntIdTable() {
     var from = varchar("from", 50)
     var content = text("content")
     val date = long("date")
+    val created = long("created")
 }

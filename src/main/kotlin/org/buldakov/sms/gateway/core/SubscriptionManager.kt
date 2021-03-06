@@ -1,6 +1,5 @@
 package org.buldakov.sms.gateway.core
 
-import com.github.kotlintelegrambot.entities.ChatId
 import org.buldakov.sms.gateway.db.Subscription
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert

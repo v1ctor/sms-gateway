@@ -6,6 +6,7 @@ import org.buldakov.huawei.modem.model.Message
 import org.buldakov.sms.gateway.db.SmsMessage
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.Executors
@@ -40,6 +41,7 @@ class SmsPoller(
                 it[content] = message.content
                 it[from] = message.phone
                 it[date] = message.date.toDateTime().millis
+                it[created] = DateTime.now().millis
             }
             messageQueue.offer(MessagePayload(message.phone, message.content))
         }
