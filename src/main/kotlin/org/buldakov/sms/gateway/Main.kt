@@ -6,7 +6,7 @@ import kotlinx.cli.default
 import kotlinx.cli.required
 
 fun main(args: Array<String>) {
-    val parser = ArgParser("nfng-bot")
+    val parser = ArgParser("sms-gateway")
     val authToken by parser.option(
         ArgType.String,
         shortName = "t",
