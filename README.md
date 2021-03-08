@@ -1,4 +1,4 @@
-# sms-gateway
+# Telegram SMS Gateway
 
 The aim of this project is to receive SMS messages and forward them to Telegram accounts which subscribed to the forwarding.
 
