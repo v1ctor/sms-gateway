@@ -48,7 +48,7 @@ fun main(args: Array<String>) {
 
     val allowedUsers = users
         ?.split(",")
-        ?.map { it.trim().toLowerCase() }
+        ?.map { it.trim().lowercase() }
         ?.toHashSet() ?: hashSetOf()
 
     val service = SmsGatewayService(dbConnection, modemUrl, username, password, allowedUsers, authToken)

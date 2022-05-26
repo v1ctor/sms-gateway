@@ -39,5 +39,5 @@ class SubscriptionManager(private val allowedUsernames: Set<String>) {
     }
 
 
-    private fun checkAuth(username: String) = allowedUsernames.contains(username.trim().toLowerCase())
+    private fun checkAuth(username: String) = allowedUsernames.contains(username.trim().lowercase())
 }
