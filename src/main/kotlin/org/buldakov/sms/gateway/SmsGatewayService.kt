@@ -10,6 +10,8 @@ import org.buldakov.huawei.modem.client.ModemClient
 import org.buldakov.sms.gateway.core.*
 import org.buldakov.sms.gateway.db.SmsMessage
 import org.buldakov.sms.gateway.db.Subscription
+import org.buldakov.sms.gateway.sms.FakeSmsClient
+import org.buldakov.sms.gateway.sms.HuaweiSmsClient
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -18,8 +20,8 @@ import java.util.concurrent.LinkedBlockingQueue
 class SmsGatewayService(
     dbConnection: String,
     modemUrl: String,
-    modemUsername: String,
-    modemPassword: String,
+    modemUsername: String?,
+    modemPassword: String?,
     allowedTelegramUsers: Set<String>,
     telegramAuthToken: String
 ) {
@@ -35,8 +37,12 @@ class SmsGatewayService(
         transaction {
             SchemaUtils.createMissingTablesAndColumns(SmsMessage, Subscription)
         }
-        val client = ModemClient(modemUrl)
-        client.login(modemUsername, modemPassword)
+        val client = if (modemUsername != null && modemPassword != null) {
+            HuaweiSmsClient(modemUrl, modemUsername, modemPassword)
+        } else {
+            FakeSmsClient()
+        }
+        client.connect()
         smsPoller = SmsPoller(client, messageQueue)
         val fakeSmsSender = FakeSmsSender(messageQueue)
         subscriptionManager = SubscriptionManager(allowedTelegramUsers)

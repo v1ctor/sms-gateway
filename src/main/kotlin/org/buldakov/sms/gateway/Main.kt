@@ -31,13 +31,13 @@ fun main(args: Array<String>) {
         shortName = "u",
         fullName = "username",
         description = "Huawei Modem HTTP API username."
-    ).required()
+    )
     val password by parser.option(
         ArgType.String,
         shortName = "p",
         fullName = "password",
         description = "Huawei Modem HTTP API password."
-    ).required()
+    )
     val users by parser.option(
         ArgType.String,
         shortName = "a",

@@ -4,6 +4,7 @@ import org.buldakov.huawei.modem.api.SmsApi
 import org.buldakov.huawei.modem.client.ModemClient
 import org.buldakov.huawei.modem.model.Message
 import org.buldakov.sms.gateway.db.SmsMessage
+import org.buldakov.sms.gateway.sms.SmsClient
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
@@ -12,7 +13,7 @@ import java.util.concurrent.BlockingQueue
 import java.util.concurrent.Executors
 
 class SmsPoller(
-    client: ModemClient,
+    private val client: SmsClient,
     private val messageQueue: BlockingQueue<MessagePayload>,
     private val interval: Long = 1000
 ) {
@@ -21,15 +22,14 @@ class SmsPoller(
 
     private val executor = Executors.newSingleThreadExecutor()
     private val stopped = false
-    private val smsApi = SmsApi(client)
 
     private fun startPolling() {
         while (!stopped) {
-            val sms = smsApi.getSms(amount = 20)
+            val sms = client.getSms()
             sms.forEach { processMessage(it) }
             log.info("$sms")
             if (sms.isNotEmpty()) {
-                smsApi.deleteSms(sms.map { it.index })
+                client.deleteSms(sms.map { it.index })
             }
             Thread.sleep(interval)
         }
